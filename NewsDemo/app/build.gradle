@@ -66,6 +66,7 @@ dependencies {
     compile 'fm.jiecao:jiecaovideoplayer:4.8.3'
     compile project(':xlistviewlibrary')
     compile 'com.liaoinstan.springview:library:1.2.6'
+    compile 'com.jaeger.statusbaruitl:library:1.0.0'
     compile 'cn.jiguang.sdk:jpush:3.0.3'  // 此处以JPush 3.0.3 版本为例。
     compile 'cn.jiguang.sdk:jcore:1.1.1'  // 此处以JCore 1.1.1 版本为例。
 }

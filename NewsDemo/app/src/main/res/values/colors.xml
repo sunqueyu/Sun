@@ -4,8 +4,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="bar">#CB3131</color>
     <!--夜间模式下的颜色-->
     <color name="nightColorPrimary">#3b3b3b</color>
     <color name="nightColorPrimaryDark">#383838</color>
     <color name="nightColorAccent">#a72b55</color>
+    <color name="nightCar">#CB3131</color>
 </resources>

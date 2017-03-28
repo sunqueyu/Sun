@@ -37,6 +37,7 @@ import com.example.administrator.newsdemo.fragment.Frag_News;
 import com.example.administrator.newsdemo.fragment.Frag_Video;
 import com.example.administrator.newsdemo.util.DBHelper;
 import com.example.administrator.newsdemo.util.Utils;
+import com.jaeger.library.StatusBarUtil;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.auth.QQToken;
@@ -107,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //沉浸式
+        StatusBarUtil.setColor(MainActivity.this,getResources().getColor(R.color.bar),0);
+        StatusBarUtil.setTransparent(MainActivity.this);//设置标题栏为全透明
+
         //传入参数APPID和全局Context上下文
         mTencent = Tencent.createInstance(APP_ID, MainActivity.this.getApplicationContext());
 
