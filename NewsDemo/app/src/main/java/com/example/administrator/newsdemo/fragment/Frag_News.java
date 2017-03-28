@@ -158,6 +158,7 @@ public class Frag_News extends Fragment {
                     intent.putExtra("title", list.get(position).getTitle());
                     intent.putExtra("url", list.get(position).getUrl());
                     startActivity(intent);
+                    //getActivity().overridePendingTransition(R.anim.slide_up_stop, R.anim.slide_up_in);
                 }
             });
         }

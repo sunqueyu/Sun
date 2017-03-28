@@ -17,6 +17,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -111,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //沉浸式
         StatusBarUtil.setColor(MainActivity.this,getResources().getColor(R.color.bar),0);
-        StatusBarUtil.setTransparent(MainActivity.this);//设置标题栏为全透明
+       // StatusBarUtil.setTransparent(MainActivity.this);//设置标题栏为全透明
+        StatusBarUtil.setTranslucent(MainActivity.this,112);//设置标题栏为半透明颜色
 
         //传入参数APPID和全局Context上下文
         mTencent = Tencent.createInstance(APP_ID, MainActivity.this.getApplicationContext());
@@ -275,14 +277,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 break;
 
+            //加号按扭
             case R.id.bu_image:
                 Intent intent = new Intent(MainActivity.this, MoreActivity.class);
                 startActivity(intent);
                 finish();
                 break;
 
+            //离线下载按扭
             case R.id.cb_download:
-
                 //跳转到下载界面
                 Intent intent1 = new Intent(MainActivity.this, DownActivity.class);
                 startActivity(intent1);
@@ -664,5 +667,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         theme = savedInstanceState.getInt("theme");
+    }
+
+    //再按退出
+    private long exitTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() ==
+                KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序",
+                        Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
