@@ -21,11 +21,11 @@
         <fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard
             android:id="@+id/jcv"
             android:layout_width="match_parent"
-            android:layout_height="220dp"></fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard>
+            android:layout_height="200dp"></fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="30dp"
             android:orientation="horizontal">
 
             <TextView
@@ -75,7 +75,7 @@
             android:layout_gravity="center"
             android:layout_height="30dp"
             android:gravity="center"
-            android:src="@mipmap/download_ad_details" />
+            android:src="@mipmap/downloadicon_leftdrawer_pressed_night" />
 
         <ImageView
             android:id="@+id/share"

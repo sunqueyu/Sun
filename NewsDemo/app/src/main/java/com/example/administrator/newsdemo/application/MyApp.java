@@ -1,6 +1,7 @@
 package com.example.administrator.newsdemo.application;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -14,6 +15,9 @@ import org.xutils.x;
  */
 
 public class MyApp extends Application {
+
+    public static int fontInt = 0;
+    public static Context context;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -21,6 +25,8 @@ public class MyApp extends Application {
         x.Ext.setDebug(false);
 
         initImage();
+
+        context=getApplicationContext();
 
     }
 
@@ -30,5 +36,9 @@ public class MyApp extends Application {
                 .diskCacheFileNameGenerator(new Md5FileNameGenerator())
                 .build();
         ImageLoader.getInstance().init(configuration);
+    }
+
+    public static Context getContext(){
+        return context;
     }
 }

@@ -18,7 +18,9 @@ import android.widget.TextView;
 
 import com.example.administrator.newsdemo.R;
 import com.example.administrator.newsdemo.activity.NextActivity;
+import com.example.administrator.newsdemo.application.MyApp;
 import com.example.administrator.newsdemo.bean.Info;
+import com.example.administrator.newsdemo.util.SizeDemo;
 import com.google.gson.Gson;
 import com.liaoinstan.springview.container.AliFooter;
 import com.liaoinstan.springview.container.AliHeader;
@@ -55,7 +57,13 @@ public class Frag_News extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_news, null);
+        if(view==null){
+            view = inflater.inflate(R.layout.frag_news, null);
+        }
+        ViewGroup viewGroup = (ViewGroup) view.getParent();
+        if(viewGroup!=null){
+            viewGroup.removeView(view);
+        }
         Bundle bundle = getArguments();
         path = bundle.getString("path");
         return view;
@@ -247,6 +255,13 @@ public class Frag_News extends Fragment {
                     holder1.author_name1.setText(list.get(position).getAuthor_name());
                     holder1.category1.setText(list.get(position).getCategory());
                     holder1.date1.setText(list.get(position).getDate());
+                    if(MyApp.fontInt==1){
+                        holder1.text_title1.setTextSize(SizeDemo.px2dip(20));
+                    }else if(MyApp.fontInt==2){
+                        holder1.text_title1.setTextSize(SizeDemo.px2dip(30));
+                    }else if(MyApp.fontInt==3){
+                        holder1.text_title1.setTextSize(SizeDemo.px2dip(40));
+                    }
                     break;
 
                 case 1:
@@ -256,6 +271,13 @@ public class Frag_News extends Fragment {
                     holder2.author_name2.setText(list.get(position).getAuthor_name());
                     holder2.category2.setText(list.get(position).getCategory());
                     holder2.date2.setText(list.get(position).getDate());
+                    if(MyApp.fontInt==1){
+                        holder2.text_title2.setTextSize(SizeDemo.px2dip(20));
+                    }else if(MyApp.fontInt==2){
+                        holder2.text_title2.setTextSize(SizeDemo.px2dip(30));
+                    }else if(MyApp.fontInt==3){
+                        holder2.text_title2.setTextSize(SizeDemo.px2dip(40));
+                    }
                     break;
 
                 case 2:
@@ -266,8 +288,17 @@ public class Frag_News extends Fragment {
                     holder3.author_name3.setText(list.get(position).getAuthor_name());
                     holder3.category3.setText(list.get(position).getCategory());
                     holder3.date3.setText(list.get(position).getDate());
+                    if(MyApp.fontInt==1){
+                        holder3.text_title3.setTextSize(SizeDemo.px2dip(20));
+                    }else if(MyApp.fontInt==2){
+                        holder3.text_title3.setTextSize(SizeDemo.px2dip(30));
+                    }else if(MyApp.fontInt==3){
+                        holder3.text_title3.setTextSize(SizeDemo.px2dip(40));
+                    }
                     break;
             }
+
+
             return convertView;
         }
 

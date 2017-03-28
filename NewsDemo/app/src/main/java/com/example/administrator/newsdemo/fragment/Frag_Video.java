@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -21,7 +20,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.administrator.newsdemo.R;
 import com.example.administrator.newsdemo.activity.MainActivity;
+import com.example.administrator.newsdemo.application.MyApp;
 import com.example.administrator.newsdemo.bean.Media_Bean;
+import com.example.administrator.newsdemo.util.SizeDemo;
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -74,9 +75,15 @@ public class Frag_Video extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_video, null);
         activity = (MainActivity) getActivity();
+        if(view==null){
+            view = inflater.inflate(R.layout.frag_video, null);
 
+        }
+        ViewGroup viewGroup = (ViewGroup) view.getParent();
+        if(viewGroup!=null){
+            viewGroup.removeView(view);
+        }
         return view;
     }
 
@@ -106,8 +113,12 @@ public class Frag_Video extends Fragment {
 
             @Override
             public void onLoadMore() {
+                if (a == 2) {
+                    a = -1;
+                }
                 a++;
                 getDatas(a);
+
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -133,6 +144,8 @@ public class Frag_Video extends Fragment {
 
 
     private void getData(String url) {
+
+
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(getActivity(), url, new TextHttpResponseHandler() {
             @Override
@@ -345,6 +358,13 @@ public class Frag_Video extends Fragment {
                     });
                 }
             });
+            if(MyApp.fontInt==1){
+                holder.tv_title.setTextSize(SizeDemo.px2dip(20));
+            }else if(MyApp.fontInt==2){
+                holder.tv_title.setTextSize(SizeDemo.px2dip(30));
+            }else if(MyApp.fontInt==3){
+                holder.tv_title.setTextSize(SizeDemo.px2dip(40));
+            }
             return convertView;
         }
 

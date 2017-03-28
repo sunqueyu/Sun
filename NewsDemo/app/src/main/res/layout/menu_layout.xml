@@ -133,6 +133,7 @@
             android:text="夜间模式" />
 
         <CheckBox
+            android:id="@+id/cb_setting"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"

@@ -2,8 +2,6 @@ package com.example.administrator.newsdemo.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -33,11 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.newsdemo.R;
+import com.example.administrator.newsdemo.application.MyApp;
 import com.example.administrator.newsdemo.bean.DB_Bean;
 import com.example.administrator.newsdemo.fragment.Frag_News;
 import com.example.administrator.newsdemo.fragment.Frag_Video;
 import com.example.administrator.newsdemo.util.DBHelper;
-import com.example.administrator.newsdemo.util.NetUtils;
 import com.example.administrator.newsdemo.util.Utils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.tencent.connect.UserInfo;
@@ -47,11 +45,8 @@ import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xutils.common.Callback;
-import org.xutils.http.RequestParams;
 import org.xutils.image.ImageOptions;
 import org.xutils.x;
 
@@ -98,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int CROP_SMALL_PICTURE = 2;
     private static final int REQUESTCODE_PICK = 1;
     protected static Uri tempUri;
+    private CheckBox cb_setting;
 
 
     @Override
@@ -131,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showChoosePicDialog();
             }
         });
+
+
     }
 
     /**
@@ -278,17 +276,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.cb_download:
-                boolean workIsAvailable = NetUtils.isNetWorkIsAvailable(MainActivity.this);
-                if (!workIsAvailable) {
-                    Toast.makeText(MainActivity.this, "网络未连接，请设置网络", Toast.LENGTH_SHORT).show();
-                    Intent intents = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                    startActivity(intents);
-                } else {
-                    //连接成功下载
-                    Toast.makeText(MainActivity.this, "网络连接成功", Toast.LENGTH_SHORT).show();
 
-                    download();
-                }
+                //跳转到下载界面
+                Intent intent1 = new Intent(MainActivity.this, DownActivity.class);
+                startActivity(intent1);
+                break;
+
+            //更改字体大小
+            case R.id.cb_setting:
+                showDialog();
                 break;
         }
     }
@@ -383,9 +379,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lin_no = (LinearLayout) menu.findViewById(R.id.lin_no);
         cb_night = (CheckBox) menu.findViewById(R.id.cb_night);
         cb_download = (CheckBox) menu.findViewById(R.id.cb_download);
+        cb_setting = (CheckBox) menu.findViewById(R.id.cb_setting);
 
         cb_night.setOnClickListener(this);
         cb_download.setOnClickListener(this);
+        cb_setting.setOnClickListener(this);
 
         ImageView account_icon_qzone = (ImageView) menu.findViewById(R.id.account_icon_qzone);
         ImageView account_icon_weibo = (ImageView) menu.findViewById(R.id.account_icon_weibo);
@@ -580,217 +578,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    //下载
-    private void download() {
-        final String[] items = {"wifi", "手机流量"};
-        //参数-1 默认被选中的position
-        new android.app.AlertDialog.Builder(this).setTitle("网络选择").setIcon(R.mipmap.ic_launcher).setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
 
-                switch (which) {
-                    case 0:
-                        //wifi下 下载apk
-                        downloadApk();
-                        break;
-                    case 1:
-                        //手机流量下提醒用户
-                        boolean mobile = NetUtils.isMobile(MainActivity.this);
-                        if (mobile) {
-                            Toast.makeText(MainActivity.this, "现在未使用wifi,将耗用手机流量", Toast.LENGTH_SHORT).show();
-                            Intent wifiSettingsIntent = new Intent("android.settings.WIFI_SETTINGS");
-                            startActivity(wifiSettingsIntent);
-                        }
-
-                        break;
-                }
-                dialog.dismiss();
-            }
-        }).show();
-    }
-
-    private void downloadApk() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("版本更新");
-        builder.setMessage("现在检测到新版本，是否更新？");
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+    //更改字体大小的方法
+    private void showDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = View.inflate(this, R.layout.setting_dialog, null);
+        CheckBox setting_dialog_small = (CheckBox) view.findViewById(R.id.setting_dialog_small);
+        CheckBox setting_dialog_middle = (CheckBox) view.findViewById(R.id.setting_dialog_middle);
+        CheckBox setting_dialog_big = (CheckBox) view.findViewById(R.id.setting_dialog_big);
+        TextView setting_dialog_quTv = (TextView) view.findViewById(R.id.setting_dialog_quTv);
+        builder.setView(view);
+        final AlertDialog dialog = builder.show();
+        setting_dialog_quTv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                updateApk();
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(View view) {
                 dialog.dismiss();
             }
         });
-        builder.create();
-        builder.show();
-    }
-
-    //版本更新
-    private void updateApk() {
-        RequestParams params = new RequestParams("http://mapp.qzone.qq.com/cgi-bin/mapp/mapp_subcatelist_qq?yyb_cateid=-10&categoryName=%E8%85%BE%E8%AE%AF%E8%BD%AF%E4%BB%B6&pageNo=1&pageSize=20&type=app&platform=touch&network_type=unknown&resolution=412x732");
-        x.http().get(params, new Callback.CommonCallback<String>() {
+        setting_dialog_middle.setChecked(true);
+        if (MyApp.fontInt == 1) {
+            setting_dialog_small.setChecked(true);
+            setting_dialog_middle.setChecked(false);
+            setting_dialog_big.setChecked(false);
+        } else if (MyApp.fontInt == 2) {
+            setting_dialog_middle.setChecked(true);
+            setting_dialog_small.setChecked(false);
+            setting_dialog_big.setChecked(false);
+        } else if (MyApp.fontInt == 3) {
+            setting_dialog_big.setChecked(true);
+            setting_dialog_small.setChecked(false);
+            setting_dialog_middle.setChecked(false);
+        }
+        //小字体
+        setting_dialog_small.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onSuccess(String result) {
-                Log.i("xxx", result.toString());
-                try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    JSONArray jsonArray = jsonObject.getJSONArray("app");
-                    JSONObject jo = jsonArray.getJSONObject(0);
-                    //url  apk地址
-                    String url = jo.getString("url");
-                    String version = jo.getString("versionName");
-                    Log.i("xxx", "url:" + url + ",versionName:" + version);
-                    String versionName = getVersionName();
-                    //判断versionName
-                /*if (version.compareTo(versionName) > 0) {
-                    showChoiseDialog(url);
-                }*/
-                    showChoiseDialog(url);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    MyApp.fontInt = 1;
+                    Toast.makeText(MainActivity.this, "改变完成", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
                 }
             }
+        });
 
+        //中字体
+        setting_dialog_middle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-
-            }
-
-            @Override
-            public void onFinished() {
-
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    MyApp.fontInt = 2;
+                    Toast.makeText(MainActivity.this, "改变完成", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
             }
         });
 
-    }
-
-
-    //获取版本名称
-    private String getVersionName() {
-        // 获取packagemanager的实例
-        PackageManager packageManager = getPackageManager();
-        // getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo info = null;
-        try {
-            info = packageManager.getPackageInfo(getPackageName(), 0);
-
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        String versionName = info.versionName;
-        return versionName;
-
-    }
-
-    public String getVersionCode() {
-        // 获取packagemanager的实例
-        PackageManager packageManager = getPackageManager();
-        // getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo packInfo = null;
-        try {
-            packInfo = packageManager.getPackageInfo(getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        String versionCode = String.valueOf(packInfo.versionCode);
-        return versionCode;
-    }
-
-
-    private void showChoiseDialog(String url) {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        android.app.AlertDialog dialog = null;
-
-        builder.setTitle("版本更新");
-        builder.setMessage("检测到新版本，是否下载更新？");
-        builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+        //大字体
+        setting_dialog_big.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //下载
-                downLoadApk();
-
-            }
-        });
-        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-    }
-
-    private void downLoadApk() {
-        //String url = "http://192.168.190.1:8080/08web/app.apk";
-
-        RequestParams params = new RequestParams("http://mapp.qzone.qq.com/cgi-bin/mapp/mapp_subcatelist_qq?yyb_cateid=-10&categoryName=%E8%85%BE%E8%AE%AF%E8%BD%AF%E4%BB%B6&pageNo=1&pageSize=20&type=app&platform=touch&network_type=unknown&resolution=412x732");
-        //自定义保存路径 Environment.getExternalStorageDirectory() sdcard 根目录
-
-        params.setSaveFilePath(Environment.getExternalStorageDirectory() + "/app/");
-        //自动为文件命令
-        params.setAutoRename(true);
-        x.http().post(params, new Callback.ProgressCallback<File>() {
-
-            //网络请求成功时回调
-            @Override
-            public void onSuccess(File result) {
-                Toast.makeText(MainActivity.this, "下载成功", Toast.LENGTH_SHORT).show();
-                //apk下载完成后 调用系统的安装方法
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(result), "application/vnd.android.package-archive");
-                startActivity(intent);
-                Toast.makeText(MainActivity.this, "安装成功", Toast.LENGTH_SHORT).show();
-
-            }
-
-            //网络请求错误时回调
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-
-            }
-
-            //网络请求取消的时候回调
-            @Override
-            public void onCancelled(CancelledException cex) {
-
-            }
-
-            //网络请求完成的时候回调
-            @Override
-            public void onFinished() {
-
-            }
-
-            //网络请求之前回调
-            @Override
-            public void onWaiting() {
-
-            }
-
-            //网络请求开始的时候回调
-            @Override
-            public void onStarted() {
-
-            }
-
-            //下载的时候不断回调的方法
-            @Override
-            public void onLoading(long total, long current, boolean isDownloading) {
-                //文件总大小和当前进度
-                Log.i("xxx", total + "," + current);
-
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    MyApp.fontInt = 3;
+                    Toast.makeText(MainActivity.this, "改变完成", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
             }
         });
     }

@@ -9,6 +9,8 @@ import com.example.administrator.newsdemo.R;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.jpush.android.api.JPushInterface;
+
 /**
  * 类的用途：
  * Created by Administrator on 2017/3/17.
@@ -42,5 +44,10 @@ public class WelActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome_activity);
         timer.schedule(task, 1000, 1000);
+
+        //初始化JPush
+        JPushInterface.init(this);
+        //设置debug模式
+        JPushInterface.setDebugMode(true);
     }
 }
